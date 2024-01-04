@@ -1,0 +1,6 @@
+(executable
+ (public_name ohtml)
+ (name main)
+ (libraries ohtml)
+ (preprocess
+  (pps ppx_inline_test)))
