@@ -10,5 +10,7 @@ val print : t -> string
 val tag : string -> ?attr:string -> t list -> t
 
 (* Create div tag *)
-val div : ?classes: string list -> t list -> t
+val a : ?href:string -> ?classes:string list -> t list -> t
 
+(* Create div tag *)
+val div : ?classes:string list -> t list -> t
