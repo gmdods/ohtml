@@ -37,11 +37,11 @@ module Attr = struct
   ;;
 end
 
-type 'a tag = ?attr:string -> 'a
+type element = ?attr:string -> t list -> t
 
-let tag tags ?(attr = "") inner =
+let element tag ~prop ?(attr = "") inner =
   let (HTML inner) = concat inner in
-  html @@ "<" ^ tags ^ attr ^ ">" ^ inner ^ "</" ^ tags ^ ">"
+  html @@ "<" ^ tag ^ prop ^ attr ^ ">" ^ inner ^ "</" ^ tag ^ ">"
 ;;
 
 type regular =
@@ -50,34 +50,33 @@ type regular =
   -> ?hidden:bool
   -> ?classes:Attr.classes
   -> ?styles:Attr.styles
+  -> ?attr:string
   -> t list
   -> t
 
 let regular_tag
-  tags
-  ?(attr = "")
+  tag
+  ~prop
   ?id
   ?title
   ?(hidden = false)
   ?(classes = [])
   ?(styles = [])
   =
-  let regulars =
-    Attr.opt_attr "id" id
+  let prop =
+    prop
+    ^ Attr.opt_attr "id" id
     ^ Attr.opt_attr "title" title
     ^ Attr.bool_attr "hidden" hidden
     ^ Attr.classes classes
     ^ Attr.styles styles
   in
-  tag tags ~attr:(attr ^ regulars)
+  element tag ~prop
 ;;
 
-let a ?(attr = "") ?href =
-  regular_tag "a" ~attr:(attr ^ Attr.opt_attr "href" href)
-;;
-
-let div ?(attr = "") = regular_tag "div" ~attr
-let p ?(attr = "") = regular_tag "p" ~attr
+let a ?href = regular_tag "a" ~prop:(Attr.opt_attr "href" href)
+let div = regular_tag "div" ~prop:""
+let p = regular_tag "p" ~prop:""
 
 let%test "div" =
   div [ p [ html "Hello" ]; p [ html "World" ]; p ~hidden:true [ html "!" ] ]
