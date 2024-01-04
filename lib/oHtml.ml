@@ -25,11 +25,9 @@ module Attr = struct
     | true -> " " ^ attribute
   ;;
 
-  type classes = string list
-
   let classes = list_attr "class" (String.concat " ")
 
-  type styles = (string * string) list
+  type style = string * string
 
   let styles =
     let css (k, v) = k ^ ": " ^ v ^ ";" in
@@ -48,11 +46,9 @@ type regular =
   ?id:string
   -> ?title:string
   -> ?hidden:bool
-  -> ?classes:Attr.classes
-  -> ?styles:Attr.styles
-  -> ?attr:string
-  -> t list
-  -> t
+  -> ?classes:string list
+  -> ?styles:Attr.style list
+  -> element
 
 let regular_tag
   tag

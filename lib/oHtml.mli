@@ -13,17 +13,14 @@ module Attr : sig
   val list_attr : string -> ('a list -> string) -> 'a list -> string
   val bool_attr : string -> bool -> string
 
-  (* Encodes a list of classes *)
-  type classes = string list
-
   (* Generate a list of classes *)
   val classes : string list -> string
 
-  (* Encoding a list key-value pair of styles *)
-  type styles = (string * string) list
+  (* Encoding a key-value CSS pair *)
+  type style = string * string
 
   (* Generate a list of styles *)
-  val styles : (string * string) list -> string
+  val styles : style list -> string
 end
 
 type element = ?attr:string -> t list -> t
@@ -35,8 +32,8 @@ type regular =
   ?id:string
   -> ?title:string
   -> ?hidden:bool
-  -> ?classes:Attr.classes
-  -> ?styles:Attr.styles
+  -> ?classes:string list
+  -> ?styles:Attr.style list
   -> element
 
 (* Create an enclosed HTML tag *)
