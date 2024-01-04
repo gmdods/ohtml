@@ -1,4 +1,4 @@
 (test
- (name ohtml)
+ (name oHtml)
  (preprocess
   (pps ppx_inline_test)))

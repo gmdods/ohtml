@@ -1,6 +1,6 @@
 (lang dune 3.7)
 
-(name ohtml)
+(name oHtml)
 
 (generate_opam_files true)
 
@@ -12,7 +12,7 @@
 (license GPL-2.0)
 
 (package
- (name ohtml)
+ (name oHtml)
  (synopsis "A(nother) OCaml HTML building library")
  (description "An OCaml library for compile-time correct HTML")
  (depends ocaml dune)

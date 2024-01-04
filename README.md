@@ -1,4 +1,4 @@
-# ohtml
+# OHtml
 A(nother) OCaml HTML building library
 
 ## Influence
