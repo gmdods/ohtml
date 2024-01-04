@@ -8,7 +8,10 @@ let cat (HTML lhs) (HTML rhs) = HTML (String.cat lhs rhs)
 let concat = List.fold_left cat (HTML "")
 
 module Attr = struct
+  type t = string * string
+
   let attr attribute str = " " ^ attribute ^ "=\"" ^ str ^ "\""
+  let list = List.fold_left (fun s (a, v) -> s ^ attr a v) ""
 
   let opt_attr attribute = function
     | None -> ""
@@ -35,11 +38,12 @@ module Attr = struct
   ;;
 end
 
-type element = ?attr:string -> t list -> t
+type element = ?attrs:Attr.t list -> t list -> t
 
-let element tag ~prop ?(attr = "") inner =
+let element tag ~prop ?(attrs = []) inner =
   let (HTML inner) = concat inner in
-  html @@ "<" ^ tag ^ prop ^ attr ^ ">" ^ inner ^ "</" ^ tag ^ ">"
+  let attrs = prop ^ Attr.list attrs in
+  html @@ "<" ^ tag ^ attrs ^ ">" ^ inner ^ "</" ^ tag ^ ">"
 ;;
 
 type regular =
@@ -73,10 +77,11 @@ let regular_tag
 let a ?href = regular_tag "a" ~prop:(Attr.opt_attr "href" href)
 let div = regular_tag "div" ~prop:""
 let p = regular_tag "p" ~prop:""
+let button = regular_tag "button" ~prop:""
 
 let%test "div" =
   div [ p [ html "Hello" ]; p [ html "World" ]; p ~hidden:true [ html "!" ] ]
-  = html "<div><p>Hello</p><p>World</p><p hidden>!</p></div>"
+  = html @@ "<div>" ^ "<p>Hello</p><p>World</p><p hidden>!</p>" ^ "</div>"
 ;;
 
 let%test "styles" =
@@ -93,4 +98,12 @@ let%test "styles" =
 let%test "a" =
   a ~href:"https://ocaml.org" ~classes:[ "link" ] [ html "Link" ]
   = html @@ "<a href=\"https://ocaml.org\" class=\"link\">" ^ "Link" ^ "</a>"
+;;
+
+let%test "button" =
+  button ~classes:[ "click" ] [ html "Click" ] ~attrs:[ "onclick", "add(this)" ]
+  = html
+    @@ "<button class=\"click\" onclick=\"add(this)\">"
+    ^ "Click"
+    ^ "</button>"
 ;;

@@ -1,3 +1,4 @@
+(* Opaque HTML type *)
 type t
 
 (* Lift string into managed HTML *)
@@ -7,6 +8,9 @@ val html : string -> t
 val print : t -> string
 
 module Attr : sig
+  (* Attribute key-value pair *)
+  type t = string * string
+
   (* Generate a new attribute *)
   val attr : string -> string -> string
   val opt_attr : string -> string option -> string
@@ -23,7 +27,7 @@ module Attr : sig
   val styles : style list -> string
 end
 
-type element = ?attr:string -> t list -> t
+type element = ?attrs:Attr.t list -> t list -> t
 
 (* Create an enclosed HTML tag *)
 val element : string -> prop:string -> element
@@ -47,3 +51,6 @@ val div : regular
 
 (* Create `p tag *)
 val p : regular
+
+(* Create `button tag *)
+val button : regular
