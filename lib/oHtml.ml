@@ -20,28 +20,47 @@ module Attr = struct
 
   let attr attr = as_string (fun str -> " " ^ attr ^ "=\"" ^ str ^ "\"")
   let classes = as_list (fun c -> attr "class" @@ String.concat " " c)
+
+  let styles =
+    as_list (fun c ->
+      attr "style"
+      @@ String.concat ""
+      @@ List.map (fun (k, v) -> k ^ ": " ^ v ^ ";") c)
+  ;;
 end
 
-let tag tag ?(attr = "") inner =
+let tag tags ?(attr = "") inner =
   let (HTML inner) = concat inner in
   let attr = Attr.as_string Fun.id attr in
-  html @@ "<" ^ tag ^ attr ^ ">" ^ inner ^ "</" ^ tag ^ ">"
+  html @@ "<" ^ tags ^ attr ^ ">" ^ inner ^ "</" ^ tags ^ ">"
 ;;
 
-let a ?(href = "") ?(classes = []) =
-  tag "a" ~attr:(Attr.attr "href" href ^ Attr.classes classes)
+type regular =
+  ?id:string
+  -> ?classes:string list
+  -> ?styles:(string * string) list
+  -> t list
+  -> t
+
+let regular_tag tags ?(attr = "") ?(id = "") ?(classes = []) ?(styles = []) =
+  let regulars =
+    Attr.attr "id" id ^ Attr.classes classes ^ Attr.styles styles
+  in
+  tag tags ~attr:(attr ^ regulars)
 ;;
 
-let div ?(classes = []) = tag "div" ~attr:(Attr.classes classes)
+let a ?(href = "") = regular_tag "a" ~attr:(Attr.attr "href" href)
+let div = regular_tag "div" ~attr:""
+let p = regular_tag "p" ~attr:""
 
-let%test "div" =
+let%test "div, styles" =
   div
     ~classes:[ "great"; "awesome" ]
-    [ div [ html "Hello" ]; div [ html "World" ] ]
+    [ p [ html "Hello" ]; p ~styles:[ "color", "blue" ] [ html "World" ] ]
   = html
     @@ "<div class=\"great awesome\">"
-    ^ "<div>Hello</div>"
-    ^ "<div>World</div>"
+    ^ "<p>Hello</p>"
+    ^ "<p style=\"color: blue;\">World</p>"
     ^ "</div>"
 ;;
 

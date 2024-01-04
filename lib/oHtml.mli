@@ -12,13 +12,29 @@ module Attr : sig
 
   (* Generate a list of classes *)
   val classes : string list -> string
+
+  (* Generate a list of classes *)
+  val styles : (string * string) list -> string
 end
 
 (* Create an enclosed HTML tag *)
 val tag : string -> ?attr:string -> t list -> t
 
+type regular =
+  ?id:string
+  -> ?classes:string list
+  -> ?styles:(string * string) list
+  -> t list
+  -> t
+
+(* Create an enclosed HTML tag *)
+val regular_tag : string -> ?attr:string -> regular
+
 (* Create `a` tag *)
-val a : ?href:string -> ?classes:string list -> t list -> t
+val a : ?href:string -> regular
 
 (* Create `div` tag *)
-val div : ?classes:string list -> t list -> t
+val div : regular
+
+(* Create `p tag *)
+val p : regular
