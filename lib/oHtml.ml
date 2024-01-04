@@ -8,48 +8,46 @@ let cat (HTML lhs) (HTML rhs) = HTML (String.cat lhs rhs)
 let concat = List.fold_left cat (HTML "")
 
 module Attr = struct
-  let as_string fn = function
-    | "" -> ""
-    | full -> fn full
+  let attr attribute str = " " ^ attribute ^ "=\"" ^ str ^ "\""
+
+  let opt_attr attribute = function
+    | None -> ""
+    | Some str -> attr attribute str
   ;;
 
-  let as_list fn = function
+  let list_attr attribute fn = function
     | [] -> ""
-    | full -> fn full
+    | full -> attr attribute (fn full)
   ;;
 
-  let attr attr = as_string (fun str -> " " ^ attr ^ "=\"" ^ str ^ "\"")
-  let classes = as_list (fun c -> attr "class" @@ String.concat " " c)
+  type classes = string list
+
+  let classes = list_attr "class" (String.concat " ")
+
+  type styles = (string * string) list
 
   let styles =
-    as_list (fun c ->
-      attr "style"
-      @@ String.concat ""
-      @@ List.map (fun (k, v) -> k ^ ": " ^ v ^ ";") c)
+    let css (k, v) = k ^ ": " ^ v ^ ";" in
+    list_attr "style" (List.fold_left (fun s kv -> s ^ css kv) "")
   ;;
 end
 
 let tag tags ?(attr = "") inner =
   let (HTML inner) = concat inner in
-  let attr = Attr.as_string Fun.id attr in
   html @@ "<" ^ tags ^ attr ^ ">" ^ inner ^ "</" ^ tags ^ ">"
 ;;
 
 type regular =
-  ?id:string
-  -> ?classes:string list
-  -> ?styles:(string * string) list
-  -> t list
-  -> t
+  ?id:string -> ?classes:Attr.classes -> ?styles:Attr.styles -> t list -> t
 
-let regular_tag tags ?(attr = "") ?(id = "") ?(classes = []) ?(styles = []) =
+let regular_tag tags ?(attr = "") ?id ?(classes = []) ?(styles = []) =
   let regulars =
-    Attr.attr "id" id ^ Attr.classes classes ^ Attr.styles styles
+    Attr.opt_attr "id" id ^ Attr.classes classes ^ Attr.styles styles
   in
   tag tags ~attr:(attr ^ regulars)
 ;;
 
-let a ?(href = "") = regular_tag "a" ~attr:(Attr.attr "href" href)
+let a ?href = regular_tag "a" ~attr:(Attr.opt_attr "href" href)
 let div = regular_tag "div" ~attr:""
 let p = regular_tag "p" ~attr:""
 
