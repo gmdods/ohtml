@@ -26,6 +26,8 @@ module Attr : sig
   val styles : (string * string) list -> string
 end
 
+type 'a tag = ?attr:string -> 'a
+
 (* Create an enclosed HTML tag *)
 val tag : string -> ?attr:string -> t list -> t
 
@@ -39,13 +41,13 @@ type regular =
   -> t
 
 (* Create an enclosed HTML tag *)
-val regular_tag : string -> ?attr:string -> regular
+val regular_tag : string -> regular tag
 
 (* Create `a` tag *)
-val a : ?attr:string -> ?href:string -> regular
+val a : (?href:string -> regular) tag
 
 (* Create `div` tag *)
-val div : ?attr:string -> regular
+val div : regular tag
 
 (* Create `p tag *)
-val p : ?attr:string -> regular
+val p : regular tag

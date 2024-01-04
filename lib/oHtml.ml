@@ -37,6 +37,8 @@ module Attr = struct
   ;;
 end
 
+type 'a tag = ?attr:string -> 'a
+
 let tag tags ?(attr = "") inner =
   let (HTML inner) = concat inner in
   html @@ "<" ^ tags ^ attr ^ ">" ^ inner ^ "</" ^ tags ^ ">"
