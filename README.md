@@ -1,6 +1,12 @@
 # OHtml
 A(nother) OCaml HTML building library
 
+## Technique
+
+Using optional/named parameters to pass attributes.
+The downside of large number of option is only on the library side,
+but guarantees at most one use per attribute.
+
 ## Influence
 
 - [elm/html](https://github.com/elm/html)

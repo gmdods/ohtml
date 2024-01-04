@@ -11,6 +11,7 @@ module Attr : sig
   val attr : string -> string -> string
   val opt_attr : string -> string option -> string
   val list_attr : string -> ('a list -> string) -> 'a list -> string
+  val bool_attr : string -> bool -> string
 
   (* Encodes a list of classes *)
   type classes = string list
@@ -29,16 +30,22 @@ end
 val tag : string -> ?attr:string -> t list -> t
 
 type regular =
-  ?id:string -> ?classes:Attr.classes -> ?styles:Attr.styles -> t list -> t
+  ?id:string
+  -> ?title:string
+  -> ?hidden:bool
+  -> ?classes:Attr.classes
+  -> ?styles:Attr.styles
+  -> t list
+  -> t
 
 (* Create an enclosed HTML tag *)
 val regular_tag : string -> ?attr:string -> regular
 
 (* Create `a` tag *)
-val a : ?href:string -> regular
+val a : ?attr:string -> ?href:string -> regular
 
 (* Create `div` tag *)
-val div : regular
+val div : ?attr:string -> regular
 
 (* Create `p tag *)
-val p : regular
+val p : ?attr:string -> regular

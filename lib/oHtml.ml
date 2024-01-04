@@ -20,6 +20,11 @@ module Attr = struct
     | full -> attr attribute (fn full)
   ;;
 
+  let bool_attr attribute = function
+    | false -> ""
+    | true -> " " ^ attribute
+  ;;
+
   type classes = string list
 
   let classes = list_attr "class" (String.concat " ")
@@ -38,20 +43,46 @@ let tag tags ?(attr = "") inner =
 ;;
 
 type regular =
-  ?id:string -> ?classes:Attr.classes -> ?styles:Attr.styles -> t list -> t
+  ?id:string
+  -> ?title:string
+  -> ?hidden:bool
+  -> ?classes:Attr.classes
+  -> ?styles:Attr.styles
+  -> t list
+  -> t
 
-let regular_tag tags ?(attr = "") ?id ?(classes = []) ?(styles = []) =
+let regular_tag
+  tags
+  ?(attr = "")
+  ?id
+  ?title
+  ?(hidden = false)
+  ?(classes = [])
+  ?(styles = [])
+  =
   let regulars =
-    Attr.opt_attr "id" id ^ Attr.classes classes ^ Attr.styles styles
+    Attr.opt_attr "id" id
+    ^ Attr.opt_attr "title" title
+    ^ Attr.bool_attr "hidden" hidden
+    ^ Attr.classes classes
+    ^ Attr.styles styles
   in
   tag tags ~attr:(attr ^ regulars)
 ;;
 
-let a ?href = regular_tag "a" ~attr:(Attr.opt_attr "href" href)
-let div = regular_tag "div" ~attr:""
-let p = regular_tag "p" ~attr:""
+let a ?(attr = "") ?href =
+  regular_tag "a" ~attr:(attr ^ Attr.opt_attr "href" href)
+;;
 
-let%test "div, styles" =
+let div ?(attr = "") = regular_tag "div" ~attr
+let p ?(attr = "") = regular_tag "p" ~attr
+
+let%test "div" =
+  div [ p [ html "Hello" ]; p [ html "World" ]; p ~hidden:true [ html "!" ] ]
+  = html "<div><p>Hello</p><p>World</p><p hidden>!</p></div>"
+;;
+
+let%test "styles" =
   div
     ~classes:[ "great"; "awesome" ]
     [ p [ html "Hello" ]; p ~styles:[ "color", "blue" ] [ html "World" ] ]
