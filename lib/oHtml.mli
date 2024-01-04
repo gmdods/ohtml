@@ -12,10 +12,12 @@ module Attr : sig
   type t = string * string
 
   (* Generate a new attribute *)
-  val attr : string -> string -> string
+  val attr : t -> string
+  val concat : t list -> string
+
   val opt_attr : string -> string option -> string
-  val list_attr : string -> ('a list -> string) -> 'a list -> string
   val bool_attr : string -> bool -> string
+  val list_attr : string -> join:('a list -> string) -> 'a list -> string
 
   (* Generate a list of classes *)
   val classes : string list -> string

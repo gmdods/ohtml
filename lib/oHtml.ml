@@ -10,31 +10,31 @@ let concat = List.fold_left cat (HTML "")
 module Attr = struct
   type t = string * string
 
-  let attr attribute str = " " ^ attribute ^ "=\"" ^ str ^ "\""
-  let list = List.fold_left (fun s (a, v) -> s ^ attr a v) ""
+  let attr (label, attribute) = " " ^ label ^ "=\"" ^ attribute ^ "\""
+  let concat = List.fold_left (fun s a -> s ^ attr a) ""
 
-  let opt_attr attribute = function
+  let opt_attr label = function
     | None -> ""
-    | Some str -> attr attribute str
+    | Some attribute -> attr (label, attribute)
   ;;
 
-  let list_attr attribute fn = function
+  let list_attr label ~join = function
     | [] -> ""
-    | full -> attr attribute (fn full)
+    | attributes -> attr (label, join attributes)
   ;;
 
-  let bool_attr attribute = function
+  let bool_attr label = function
     | false -> ""
-    | true -> " " ^ attribute
+    | true -> " " ^ label
   ;;
 
-  let classes = list_attr "class" (String.concat " ")
+  let classes = list_attr "class" ~join:(String.concat " ")
 
   type style = string * string
 
   let styles =
     let css (k, v) = k ^ ": " ^ v ^ ";" in
-    list_attr "style" (List.fold_left (fun s kv -> s ^ css kv) "")
+    list_attr "style" ~join:(List.fold_left (fun s kv -> s ^ css kv) "")
   ;;
 end
 
@@ -42,7 +42,7 @@ type element = ?attrs:Attr.t list -> t list -> t
 
 let element tag ~prop ?(attrs = []) inner =
   let (HTML inner) = concat inner in
-  let attrs = prop ^ Attr.list attrs in
+  let attrs = prop ^ Attr.concat attrs in
   html @@ "<" ^ tag ^ attrs ^ ">" ^ inner ^ "</" ^ tag ^ ">"
 ;;
 
